@@ -1,0 +1,14 @@
+librosa==0.9.2
+h5py==3.11.0
+keras==2.10.0
+matplotlib==3.5.3
+numba==0.56.4
+numpy==1.23.5
+phonemizer==2.2.2
+protobuf==3.19.6
+pyworld==0.3.4
+ruamel.yaml==0.17.40
+scipy==1.10.1
+soundfile==0.12.1
+tensorflow==2.10.1
+webrtcvad-wheels==2.0.10.post1

@@ -1,0 +1,3 @@
+# Evaluation backends are intentionally isolated from the runtime package.
+# Install NISQA and text-steganalysis dependencies from their frozen upstream
+# environments; record their package freeze in every result manifest.

@@ -1,0 +1,4 @@
+cryptography==46.0.7
+psycopg[binary]==3.3.4
+PyYAML==6.0.3
+typing-extensions==4.16.0

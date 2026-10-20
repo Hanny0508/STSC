@@ -1,0 +1,31 @@
+experiment:
+  name: local_e2e
+  inherit: [paper_r1]
+  scope: software_integration_only
+
+crypto:
+  algorithm: AES-256-GCM
+  key_bytes: 32
+  nonce_bytes: 12
+
+fragmentation:
+  protocol: ZSC-TSD-SECURE-FRAGMENT-v1
+  reed_solomon: {data_bytes: 44, parity_bytes: 16}
+  shard_count: 30
+  shard_frame_bytes: 5
+
+transport:
+  backend: local_file_copy
+  counts_as_voip: false
+
+speech:
+  tts: {backend: transformertts_ljspeech_step_90000, sample_rate_hz: 22050}
+  asr: {backend: whisper_small_en, input_sample_rate_hz: 16000}
+
+receiver:
+  candidate_capacity: {v7: 4096, v6: 32768}
+  verify_crc16: true
+  verify_aes_gcm_tag: true
+
+report:
+  save_intermediate: true

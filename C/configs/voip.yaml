@@ -1,0 +1,47 @@
+experiment:
+  name: two_host_rtp_opus_e2e
+  inherit: [paper_r1]
+  topology:
+    node_a: {hostname: node-a, tailscale_ipv4: 192.0.2.10}
+    node_b: {hostname: node-b, tailscale_ipv4: 192.0.2.11}
+
+transport:
+  backend: rtp_udp_opus_over_tailscale
+  sip_signaling_implemented: false
+  media_direction: B_TO_A
+  provisioning:
+    direction: A_TO_B
+    backend: restricted_http_over_private_tailscale
+    port: 5602
+    experimental_setup_only: true
+    counted_as_voip_media: false
+  rtp:
+    payload_type: 111
+    port: 5004
+    codec: opus
+    sample_rate_hz: 48000
+    bitrate_bps: 24000
+    vbr: false
+    frame_duration_ms: 20
+  claim_boundary:
+    actual: two_host_rtp_udp_opus_media_transport
+    not_claimed: SIP_based_phone_call
+
+control_channel:
+  backend: postgresql_tcp_over_tailscale
+  server_node: node-b
+  server_port: 55432
+  database_authentication: SCRAM-SHA-256
+  event_authentication: HKDF-HMAC-SHA-256
+  secret_payload_allowed: false
+  replay_protection: true
+  expiry_validation: true
+
+network_impairment:
+  packet_loss_percent: []
+  jitter_ms: []
+  delay_ms: []
+  status: planned
+
+report:
+  include: [latency, packet_loss, jitter, recovery_rate, hmac_verification]

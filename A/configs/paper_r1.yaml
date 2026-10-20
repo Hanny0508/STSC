@@ -1,0 +1,166 @@
+# ============================================================
+# ZSC-TSD Paper Reproduction Configuration
+#
+# This file preserves the original experiment configuration.
+# Do NOT modify values without documenting the effect on
+# previously reported results.
+# ============================================================
+
+
+experiment:
+  name: paper_r1
+  profile: paper_reproduction
+
+  seed: 2023
+
+  description:
+    >
+    Original ZSC-TSD experiment profile.
+    This configuration is used to reproduce legacy
+    text steganography experiments.
+
+
+# ============================================================
+# ZTS model configuration
+# ============================================================
+
+zts:
+
+  # Original generative model used by ZTS
+  model:
+
+    name: Llama-2-7B-chat-GPTQ
+
+    provider:
+      type: huggingface
+
+    path: "legacy/zero-shot-GLS/tmp_saves/local_models/llama-2-7b-chat-gptq-4bit-32g-actorder"
+
+    tokenizer_path: "legacy/zero-shot-GLS/tmp_saves/local_models/llama-2-7b-chat-gptq-4bit-32g-actorder"
+
+    revision: "1acb69d3ac3e683c346cb31dd2f73c06f50f9f5b"
+
+    weights_sha256: "3ed21210e3642aea37c2fac20ad8b64e769eb59a0a98c9a961f4be71ccf1ffea"
+
+
+  # Generation parameters
+  generation:
+
+    temperature: 1.0
+
+    temperature_alpha: 1.25
+
+    top_k: null
+
+    top_p: null
+
+    max_new_tokens: 160
+
+
+  # Cover text generation
+
+  cover_generation:
+
+    n_cover: 3
+
+    seed_gen_seed: 2023
+
+
+  # Embedding algorithm
+
+  embedding:
+
+    method: huffman
+
+    egs_mode: huffman
+
+    threshold: 0.002
+
+    max_bpw: 5
+
+
+  # Synchronization information
+
+  synchronization:
+
+    require_same_model: true
+
+    require_same_tokenizer: true
+
+    require_same_generation_parameters: true
+
+    verify_hash_before_decode: true
+
+
+
+# ============================================================
+# Plaintext codec
+# ============================================================
+
+plaintext_codec:
+
+  model:
+
+    name: gpt2-medium
+
+    path: ""
+
+    revision: ""
+
+
+
+# ============================================================
+# Dataset configuration
+# ============================================================
+
+dataset:
+
+  imdb:
+
+    path: legacy/zero-shot-GLS/zgls_data/imdb.csv
+
+    sha256: ""
+
+
+  twitter:
+
+    path: legacy/zero-shot-GLS/zgls_data/twitter.csv
+
+    sha256: ""
+
+
+
+# ============================================================
+# Legacy result protection
+# ============================================================
+
+legacy_results:
+
+  preserve_existing_results: true
+
+  allow_parameter_change: false
+
+  require_manifest: true
+
+
+# ============================================================
+# Speech transport backends used by the validated v1.4 batch
+# ============================================================
+
+speech:
+
+  tts:
+    backend: TransformerTTS
+    dataset: LJSpeech
+    step: 90000
+    upstream_git_hash: bdf06b9
+    path: artifacts/tts_models/bdf06b9_ljspeech_step_90000/bdf06b9_ljspeech_step_90000
+    config_sha256: "351f02a7a1a5020e1deba116e3250a48eaf42cac211b057c474a12533a1bc1e6"
+    weights_sha256: "26159a9214dce219e64f451e0bb9694f4503776f9740de149b32414fc861255e"
+
+  asr:
+    backend: Whisper
+    model: openai/whisper-small.en
+    revision: "9dcb3056ddba3fcf664920f68cf3ebd264d811cf"
+    path: artifacts/asr_models/whisper-small.en
+    weights_sha256: "6014ac49b506df900f66f4aca6b0801eed7245594ace97bcaf73e0ae5b863066"

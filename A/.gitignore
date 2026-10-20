@@ -1,0 +1,155 @@
+# ============================================================
+# Python
+# ============================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+
+# ============================================================
+# Virtual environments
+# ============================================================
+
+.venv/
+venv/
+env/
+.env/
+conda-env/
+
+
+# ============================================================
+# Secrets and local configuration
+# ============================================================
+
+.env
+.env.local
+.env.*.local
+
+*.key
+*.pem
+*.p12
+*.pfx
+
+secrets/
+keys/
+
+
+# ============================================================
+# IDE and operating-system files
+# ============================================================
+
+.idea/
+.vscode/
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+*.swp
+*.swo
+*~
+
+
+# ============================================================
+# Runtime outputs
+# ============================================================
+
+runs/
+logs/
+output/
+outputs/
+checkpoints/
+cache/
+tmp/
+
+*.log
+
+
+# ============================================================
+# Models
+# Model weights must never be committed to Git.
+# ============================================================
+
+models/
+model_cache/
+
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+
+
+# ============================================================
+# Generated end-to-end artifacts
+# Keep directory placeholders only.
+# ============================================================
+
+artifacts/paper_r1/*
+!artifacts/paper_r1/.gitkeep
+
+artifacts/new_e2e/*
+!artifacts/new_e2e/.gitkeep
+
+
+# ============================================================
+# Large legacy datasets
+# Preserve them locally, but do not upload them to GitHub.
+# Their SHA-256 values will be recorded in a manifest.
+# ============================================================
+
+legacy/zero-shot-GLS/zgls_data/*.csv
+legacy/zero-shot-GLS/tmp_saves/*.csv
+
+
+# ============================================================
+# Legacy build products and caches
+# ============================================================
+
+legacy/**/.git/
+legacy/**/__pycache__/
+legacy/**/*.pyc
+legacy/**/build/
+legacy/**/*.egg-info/
+
+legacy/**/.DS_Store
+
+
+# ============================================================
+# Audio generated during experiments
+# Existing reference audio may later be selectively committed.
+# ============================================================
+
+*.tmp.wav
+*.generated.wav
+*.received.wav
+*.transmitted.wav
+
+
+# ============================================================
+# Local databases and packet captures
+# ============================================================
+
+*.db
+*.sqlite
+*.sqlite3
+
+*.pcap
+*.pcapng

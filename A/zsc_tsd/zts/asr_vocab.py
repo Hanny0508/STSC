@@ -1,0 +1,17 @@
+DOMAIN_WORDS = {
+    "IoT",
+    "IoMT",
+    "IIoT",
+    "AI",
+    "ML",
+    "TLS",
+    "SSL",
+    "IPSec",
+    "L2F",
+    "blockchain",
+    "encryption",
+    "protocol",
+    "secure",
+    "cyber",
+    "sensory",
+}
