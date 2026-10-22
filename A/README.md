@@ -270,6 +270,57 @@ run to claim exact message recovery. `ZSC_TSD_DUAL_CHANNEL_END_TO_END_PASS`
 requires a decoder report in which receiver decoding, Reed-Solomon recovery,
 AES-GCM authentication, and exact plaintext matching are all true.
 
+## Run the complete FACodec network end-to-end batch
+
+The single-session workflow above verifies media delivery. The complete
+FACodec end-to-end path (DAQ-TTS = TransformerTTS + FACodec, then ASR and
+text-domain decoding, then RS reconstruction and AES-GCM authentication) is
+driven by the batch tools. The batch runner executes, for every carrier:
+carrier preparation, a signed control handshake, B-to-A RTP/UDP Opus
+transmission, receiver-side ASR, candidate recovery, ZTS decoding, CRC
+validation, and finally Reed--Solomon reconstruction plus AES-GCM plaintext
+verification.
+
+Node A (sender + decoder) starts first:
+
+```powershell
+python -m zsc_tsd dual-channel-batch-a `
+  --secure-batch-root <batch_root> `
+  --bundle-private <bundle_private.json> `
+  --ffmpeg <ffmpeg.exe> `
+  --asr-python <zsc-tsd-asr-python.exe> `
+  --zts-python <zsc-tsd-zts-python.exe> `
+  --asr-model <whisper-small.en-directory> `
+  --a-ip <A-ip> --b-ip <B-ip> `
+  --output-base <run_root_A>
+```
+
+A prints `ZSC_TSD_BATCH_A_READY` with a `batch_id`; forward that identifier
+to node B:
+
+```powershell
+python -m zsc_tsd dual-channel-batch-relay `
+  --batch-id <BATCH_ID_FROM_A> `
+  --expected-sessions <N> `
+  --ffmpeg <ffmpeg.exe> `
+  --expected-a-ip <A-ip> --b-ip <B-ip> `
+  --output-base <run_root_B>
+```
+
+A run reports `ZSC_TSD_VOIP_SECURE_BATCH_END_TO_END_PASS` only if the number
+of distinct recovered shards meets the bundle requirement, Reed--Solomon
+reconstruction succeeds, AES-GCM authentication succeeds, and the recovered
+plaintext equals the expected secret. A run that only completes media
+delivery reports `ZSC_TSD_DUAL_CHANNEL_BATCH_RELAY_PASS` on B and a
+`ZSC_TSD_VOIP_SECURE_BATCH_END_TO_END_FAIL` / `ZSC_TSD_BATCH_A_READY` chain
+on A, never an end-to-end claim.
+
+To run the same path through the single-session command, pass the decoder
+through `--decoder-command-json`; the decoder receives `{received_wav}`,
+`{output_json}`, and `{run_root}` placeholders and must write a report
+containing the receiver decode, Reed--Solomon, AES-GCM, and plaintext-match
+booleans.
+
 ## Control channel
 
 See `docs/CONTROL_CHANNEL_V1.md`. The database carries authenticated metadata
