@@ -254,13 +254,21 @@ AES-GCM authentication, and exact plaintext matching are all true.
 ## Run the complete FACodec network end-to-end batch
 
 The single-session workflow above verifies media delivery. The complete
-FACodec end-to-end path (DAQ-TTS = TransformerTTS + FACodec, then ASR and
-text-domain decoding, then RS reconstruction and AES-GCM authentication) is
-driven by the batch tools. The batch runner executes, for every carrier:
-carrier preparation, a signed control handshake, B-to-A RTP/UDP Opus
-transmission, receiver-side ASR, candidate recovery, ZTS decoding, CRC
-validation, and finally Reed--Solomon reconstruction plus AES-GCM plaintext
-verification.
+FACodec end-to-end path is split into two stages.
+
+**Carrier generation (DAQ-TTS = TransformerTTS + FACodec).** The sender first
+generates the speech carriers from the steganographic text through the
+DAQ-TTS back end (the `zsc-tsd-tts` and `zsc-tsd-facodec` environments,
+prepared by `tools/setup_daqtts_reviewer.py`). Use
+`run_local_e2e_stage_demo.bat` or `04_run_full_experiment.ps1` to produce a
+batch directory with `public/<carrier>/carrier.wav` and
+`sender_private/<carrier>/sender.json`.
+
+**Network end-to-end recovery.** The batch tools then take those frozen
+carriers and execute, for every carrier: carrier preparation, a signed
+control handshake, B-to-A RTP/UDP Opus transmission, receiver-side ASR
+(Whisper), candidate recovery, ZTS decoding, CRC validation, and finally
+Reed--Solomon reconstruction plus AES-GCM plaintext verification.
 
 Node A (sender + decoder) starts first:
 
