@@ -137,10 +137,7 @@ Incompatible heavy dependencies are intentionally separated:
 | evaluation environment | NISQA and text-steganalysis experiments |
 | B control venv | PostgreSQL/HMAC verification only |
 
-The paper uses **DAQ-TTS** as the name of the combined speech-generation
-architecture. The reproduced end-to-end path in this artifact records its
-actual backend precisely: public TransformerTTS LJSpeech step-90000. This
-avoids presenting the public checkpoint as a newly trained model.
+The main system uses **TransformerTTS** (public LJSpeech step-90000 checkpoint) as the speech-generation back end. FACodec is included only as an optional post-processing stage and is not used in the reported experiments.
 
 ## Not bundled
 
@@ -150,8 +147,8 @@ Model checkpoints and datasets are intentionally not shipped in this repository 
 |---|---|---|
 | ZTS | `legacy/zero-shot-GLS/tmp_saves/local_models/llama-2-7b-chat-gptq-4bit-32g-actorder/` | `tools/download_models.py` |
 | ZTS prompts | `legacy/zero-shot-GLS/zgls_data/imdb.csv` (public IMDb sentence CSV: `sentence_id,plaintext`) | `tools/collect_d3_dataset.py` |
-| TransformerTTS (DAQ-TTS front end) | `artifacts/tts_models/bdf06b9_ljspeech_step_90000/{config.yaml,model_weights.hdf5}` | `tools/setup_daqtts_reviewer.py` |
-| FACodec (DAQ-TTS back end) | `ns3_facodec_encoder_v2.bin`, `ns3_facodec_decoder_v2.bin` | `tools/setup_daqtts_reviewer.py` (Hugging Face) |
+| TransformerTTS | `artifacts/tts_models/bdf06b9_ljspeech_step_90000/{config.yaml,model_weights.hdf5}` | `tools/setup_daqtts_reviewer.py` |
+| FACodec (optional) | `ns3_facodec_encoder_v2.bin`, `ns3_facodec_decoder_v2.bin` | `tools/setup_daqtts_reviewer.py` (Hugging Face) |
 | ASR | `artifacts/asr_models/whisper-small.en/` | `tools/download_models.py` |
 | NISQA | `legacy/NISQA/weights/*.tar` | download from the NISQA release |
 
@@ -270,15 +267,15 @@ run to claim exact message recovery. `ZSC_TSD_DUAL_CHANNEL_END_TO_END_PASS`
 requires a decoder report in which receiver decoding, Reed-Solomon recovery,
 AES-GCM authentication, and exact plaintext matching are all true.
 
-## Run the complete FACodec network end-to-end batch
+## Run the complete network end-to-end batch
 
 The single-session workflow above verifies media delivery. The complete
-FACodec end-to-end path is split into two stages.
+end-to-end path is split into two stages.
 
-**Carrier generation (DAQ-TTS = TransformerTTS + FACodec).** The sender first
-generates the speech carriers from the steganographic text through the
-DAQ-TTS back end (the `zsc-tsd-tts` and `zsc-tsd-facodec` environments,
-prepared by `tools/setup_daqtts_reviewer.py`). Use
+**Carrier generation (TransformerTTS).** The sender first generates the
+speech carriers from the steganographic text through the `zsc-tsd-tts`
+environment prepared by `tools/setup_daqtts_reviewer.py`. An optional FACodec
+stage can be appended afterwards, but it is not used in the reported runs. Use
 `run_local_e2e_stage_demo.bat` or `04_run_full_experiment.ps1` to produce a
 batch directory with `public/<carrier>/carrier.wav` and
 `sender_private/<carrier>/sender.json`.

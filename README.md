@@ -16,7 +16,7 @@ a small stable package/CLI; model weights and datasets are not shipped.
 
 | Folder | Role |
 |---|---|
-| `A/` | Sender node: AES-GCM + Reed-Solomon, ZTS text steganography, DAQ-TTS synthesis, dual-channel coordination, receiver-side decoding, control-channel client |
+| `A/` | Sender node: AES-GCM + Reed-Solomon, ZTS text steganography, TransformerTTS synthesis, dual-channel coordination, receiver-side decoding, control-channel client |
 | `B/` | Relay / receiver node: RTP/UDP--Opus media sender and impairment relay, control-plane (PostgreSQL) client, and receiver utilities |
 | `C/` | Second sender/receiver package: byte-identical to `A/` (generated from the same template); only the packaged prompt/corpus reference differs |
 
@@ -64,9 +64,9 @@ A/REVIEWER_GUIDE.md               Minimal reproduction commands
 A/configs/                        Frozen experiment profiles
 A/zsc_tsd/                        Stable integration package
 A/tools/                          Main-path scripts (batch runner, fragment protocol,
-                                  receiver, ASR worker, TTS/FACodec/NISQA helpers)
+                                  receiver, ASR worker, TTS/NISQA helpers)
 A/legacy/                         Sources of the integrated components
-                                  (zero-shot-GLS, TransformerTTS, FACodec, NISQA)
+                                  (zero-shot-GLS, TransformerTTS, optional FACodec, NISQA)
 A/requirements/                   Per-environment dependency lists
 C/external_tools-zgls/            (see C/) compatibility layer for the ZTS sources
 C/tests/, A/tests/                CPU tests plus optional model tests
@@ -120,13 +120,11 @@ Incompatible heavy dependencies are intentionally separated:
 | `zsc-tsd-zts` | ZTS model, orchestration, candidate receiver |
 | `zsc-tsd-tts` | TensorFlow TransformerTTS synthesis |
 | `zsc-tsd-asr` | Whisper ASR |
-| `zsc-tsd-facodec` | FACodec voice conversion (DAQ-TTS back end) |
+| `zsc-tsd-facodec` | optional FACodec voice conversion (not used in the main system) |
 | evaluation environment | NISQA and text-steganalysis experiments |
 | B control venv | PostgreSQL/HMAC verification only |
 
-The paper uses **DAQ-TTS** as the name of the combined speech-generation
-architecture. The reproduced end-to-end path in this artifact records its
-actual backend precisely: public TransformerTTS LJSpeech step-90000. This
+The main system uses **TransformerTTS** (public LJSpeech step-90000 checkpoint) as the speech-generation back end. FACodec is included only as an optional post-processing stage and is not used in the reported experiments. This
 avoids presenting the public checkpoint as a newly trained model.
 
 ## Not bundled
@@ -140,7 +138,7 @@ full pipeline:
 | ZTS | Llama-2-7B GPTQ checkpoint | `tools/download_models.py` |
 | ZTS prompts | IMDb sentence CSV (`sentence_id,plaintext`) | `tools/collect_d3_dataset.py` |
 | TransformerTTS | LJSpeech step-90000 `config.yaml` + `model_weights.hdf5` | `tools/setup_daqtts_reviewer.py` |
-| FACodec | `ns3_facodec_encoder_v2.bin`, `ns3_facodec_decoder_v2.bin` | `tools/setup_daqtts_reviewer.py` |
+| FACodec (optional) | `ns3_facodec_encoder_v2.bin`, `ns3_facodec_decoder_v2.bin` | `tools/setup_daqtts_reviewer.py` |
 | ASR | Whisper small.en | `tools/download_models.py` |
 | NISQA | NISQA weights | download from the NISQA release |
 
@@ -251,15 +249,15 @@ run to claim exact message recovery. `ZSC_TSD_DUAL_CHANNEL_END_TO_END_PASS`
 requires a decoder report in which receiver decoding, Reed-Solomon recovery,
 AES-GCM authentication, and exact plaintext matching are all true.
 
-## Run the complete FACodec network end-to-end batch
+## Run the complete network end-to-end batch
 
 The single-session workflow above verifies media delivery. The complete
-FACodec end-to-end path is split into two stages.
+end-to-end path is split into two stages.
 
-**Carrier generation (DAQ-TTS = TransformerTTS + FACodec).** The sender first
-generates the speech carriers from the steganographic text through the
-DAQ-TTS back end (the `zsc-tsd-tts` and `zsc-tsd-facodec` environments,
-prepared by `tools/setup_daqtts_reviewer.py`). Use
+**Carrier generation (TransformerTTS).** The sender first generates the
+speech carriers from the steganographic text through the `zsc-tsd-tts`
+environment prepared by `tools/setup_daqtts_reviewer.py`. An optional FACodec
+stage can be appended afterwards, but it is not used in the reported runs. Use
 `run_local_e2e_stage_demo.bat` or `04_run_full_experiment.ps1` to produce a
 batch directory with `public/<carrier>/carrier.wav` and
 `sender_private/<carrier>/sender.json`.
